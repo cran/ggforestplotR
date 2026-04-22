@@ -1,6 +1,6 @@
 Package: ggforestplotR
 Title: Publication-Ready Forest Plots with 'ggplot2'
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Carson",
            family = "Richardson",
@@ -23,8 +23,8 @@ URL: https://thatoneguy006.github.io/ggforestplotR/,
         https://github.com/thatoneguy006/ggforestplotR
 BugReports: https://github.com/thatoneguy006/ggforestplotR/issues
 NeedsCompilation: no
-Packaged: 2026-03-21 02:18:40 UTC; Carso
+Packaged: 2026-04-16 22:22:10 UTC; Carso
 Author: Carson Richardson [aut, cre, cph]
 Maintainer: Carson Richardson <carson.richardson@outlook.com>
 Repository: CRAN
-Date/Publication: 2026-03-25 20:50:17 UTC
+Date/Publication: 2026-04-22 15:00:02 UTC
