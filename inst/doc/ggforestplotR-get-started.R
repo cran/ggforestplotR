@@ -18,7 +18,9 @@ basic_coefs <- data.frame(
   conf.high = c(0.18, 0.00, 0.56)
 )
 
-ggforestplot(basic_coefs)
+ggforestplot(basic_coefs,
+             term_labels = c("Age" = "age", "BMI" = "bmi", "Treatment" = "trt"),
+             sort_terms = "descending")
 
 ## ----grouped-striped----------------------------------------------------------
 sectioned_coefs <- data.frame(
@@ -33,7 +35,9 @@ ggforestplot(
   sectioned_coefs,
   grouping = "section",
   striped_rows = TRUE,
-  stripe_fill = "grey94"
+  stripe_fill = "grey94",
+  grouping_strip_position = "right",
+  sort_terms = "ascending"
 )
 
 ## ----side-table---------------------------------------------------------------
@@ -45,22 +49,29 @@ tabled_coefs <- data.frame(
   sample_size = c(120, 115, 98, 87, 83)
 )
 
-ggforestplot(tabled_coefs, n = "sample_size", striped_rows = TRUE) +
+ggforestplot(tabled_coefs, striped_rows = TRUE) +
   add_forest_table(
     position = "left",
-    show_n = TRUE,
-    estimate_label = "Beta"
+    column_labels = c("term" = "Variable", "sample_size" = "N", "estimate" = "Beta (95% CI)"),
+    columns = c("term", "sample_size", "estimate"),
+    estimate_digits = 2,
+    interval_digits = 3
   )
 
 ## ----split-table--------------------------------------------------------------
 ggforestplot(tabled_coefs, n = "sample_size", striped_rows = T) +
   add_split_table(
     left_columns = c("term", "n"),
-    right_columns = c("estimate")
+    right_columns = c("estimate"),
+    column_labels = c("term" = "Variable", "estimate" = "Beta (95% CI)")
   )
 
 ## ----model-plot---------------------------------------------------------------
 fit <- lm(mpg ~ wt + hp + qsec, data = mtcars)
 
-ggforestplot(fit, sort_terms = "descending")
+ggforestplot(fit, sort_terms = "descending",
+             term_labels = c("wt" = "Weight"),
+             striped_rows = T) +
+  scale_x_continuous(breaks = seq(-6,2,1)) +
+  add_forest_table()
 

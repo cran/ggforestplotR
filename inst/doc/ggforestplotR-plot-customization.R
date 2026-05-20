@@ -10,18 +10,18 @@ knitr::opts_chunk$set(
 library(ggforestplotR)
 library(ggplot2)
 
-## ----setup-data---------------------------------------------------------------
+## ----grouping-right-----------------------------------------------------------
 coefs <- data.frame(
   term = c("Age", "BMI", "Smoking", "Stage II", "Stage III"),
   estimate = c(0.12, -0.10, 0.18, 0.30, 0.46),
   conf.low = c(0.03, -0.18, 0.04, 0.10, 0.18),
-  conf.high = c(0.21, -0.02, 0.32, 0.50, 0.74),
+  conf.high = c(0.21, 0.02, 0.32, 0.50, 0.74),
   sample_size = c(120, 115, 98, 87, 83),
-  p_value = c(0.04, 0.15, 0.29, 0.001, 0.75),
+  p_value = c(0.04, 0.15, 0.29, 0.001, 0.075),
   section = c("Clinical", "Clinical", "Clinical", "Tumor", "Tumor")
 )
 
-## ----grouping-right-----------------------------------------------------------
+
 ggforestplot(
   coefs,
   grouping = "section",
@@ -56,12 +56,13 @@ ggforestplot(
   grouping_strip_position = "right",
   n = "sample_size",
   p.value = "p_value",
-  striped_rows = TRUE
+  striped_rows = TRUE,
+  term_labels = c("Smoking" = "Smoking status")
 ) +
   add_forest_table(
-    show_n = TRUE,
-    show_p = TRUE,
-    estimate_label = "Beta"
+    columns = c("term", "sample_size", "estimate", "p_value"),
+    column_labels = c("term" = "Variable", "sample_size" = "N",
+                      "estimate" = "Beta (95% CI)", "p_value" = "P-value")
   )
 
 ## -----------------------------------------------------------------------------
@@ -73,9 +74,6 @@ ggforestplot(
 ) +
   add_forest_table(
     position = "left",
-    show_n = TRUE,
-    show_p = TRUE,
-    estimate_label = "Beta",
     grid_lines = T,
     grid_line_linetype = 2,
     grid_line_colour = "red"
@@ -92,7 +90,10 @@ ggforestplot(
   add_split_table(
     left_columns = c("term","n"),
     right_columns = c("estimate","p"),
-    estimate_label = "Beta"
+    column_labels = c("estimate" = "Beta [95% CI]"),
+    estimate_fmt = "{estimate} [{conf.low}, {conf.high}]",
+    estimate_digits = 2,
+    interval_digits = 3
   ) 
 
 ## ----logistic-regression-data-------------------------------------------------
@@ -103,9 +104,8 @@ l1 <- glm(Treatment ~ conc + uptake + Type, family = binomial(link = "logit"),
 
 ## ----logistic-regression, warning=FALSE---------------------------------------
 
-ggforestplot(l1, exponentiate = TRUE, striped_rows = T) +
+ggforestplot(l1, exponentiate = TRUE, striped_rows = T, term_labels = c("TypeMississippi" = "Mississippi")) +
   add_forest_table(position = "left", 
-                   estimate_label = "OR", 
                    show_p = F)
 
 ## ----survival-analysis-data---------------------------------------------------
@@ -120,7 +120,7 @@ s1 <- survival::coxph(Surv(time, status) ~ sex + age + ph.karno + pat.karno, dat
 
 ## ----survival-analysis-plot---------------------------------------------------
 ggforestplot(s1, exponentiate = T, striped_rows = T) +
-  add_forest_table(estimate_label = "HR")
+  add_forest_table()
 
 ## ----comparison---------------------------------------------------------------
 comparison_coefs <- data.frame(
@@ -140,5 +140,7 @@ ggforestplot(
   dodge_width = 0.5,
   grouping_strip_position = "right"
 ) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "top") +
+  scale_color_manual(values = c("#1F968BFF", "#453781FF")) +
+  add_forest_table()
 
