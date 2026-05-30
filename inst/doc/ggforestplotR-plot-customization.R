@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 library(ggforestplotR)
 library(ggplot2)
 
-## ----grouping-right-----------------------------------------------------------
+## ----facet-right--------------------------------------------------------------
 coefs <- data.frame(
   term = c("Age", "BMI", "Smoking", "Stage II", "Stage III"),
   estimate = c(0.12, -0.10, 0.18, 0.30, 0.46),
@@ -24,8 +24,8 @@ coefs <- data.frame(
 
 ggforestplot(
   coefs,
-  grouping = "section",
-  grouping_strip_position = "right",
+  facet = "section",
+  facet_strip_position = "right",
   striped_rows = TRUE
 )
 
@@ -52,8 +52,8 @@ ggforestplot(
 ## ----left-side-table----------------------------------------------------------
 ggforestplot(
   coefs,
-  grouping = "section",
-  grouping_strip_position = "right",
+  facet = "section",
+  facet_strip_position = "right",
   n = "sample_size",
   p.value = "p_value",
   striped_rows = TRUE,
@@ -135,10 +135,10 @@ comparison_coefs <- data.frame(
 ggforestplot(
   comparison_coefs,
   group = "model",
-  grouping = "section",
+  facet = "section",
   striped_rows = TRUE,
   dodge_width = 0.5,
-  grouping_strip_position = "right"
+  facet_strip_position = "right"
 ) +
   theme(legend.position = "top") +
   scale_color_manual(values = c("#1F968BFF", "#453781FF")) +

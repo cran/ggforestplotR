@@ -25,6 +25,7 @@
                                  striped_rows = NULL,
                                  stripe_fill = NULL,
                                  stripe_colour = NULL,
+                                 stripe_alpha = NULL,
                                  left_width = NULL,
                                  plot_width = NULL,
                                  right_width = NULL) {
@@ -37,6 +38,8 @@
   if (is.null(state)) {
     stop("`plot` must be created by `ggforestplot()` before calling `add_split_table()`.", call. = FALSE)
   }
+
+  state <- align_forest_state_to_plot_y_scale(state, plot)
 
   if (is.null(show_n)) {
     show_n <- any(!is.na(state$forest_data$n) & nzchar(state$forest_data$n))
@@ -83,6 +86,10 @@
 
   if (is.null(stripe_colour)) {
     stripe_colour <- state$defaults$stripe_colour
+  }
+
+  if (is.null(stripe_alpha)) {
+    stripe_alpha <- state$defaults$stripe_alpha
   }
 
   default_left <- c(if (isTRUE(show_terms)) "term", if (isTRUE(show_n)) "n", if (isTRUE(show_events)) "events")
@@ -204,6 +211,7 @@
     striped_rows = striped_rows,
     stripe_fill = stripe_fill,
     stripe_colour = stripe_colour,
+    stripe_alpha = stripe_alpha,
     text_size = text_size,
     grid_lines = FALSE,
     plot_margin = ggplot2::margin(5.5, 0, 5.5, 5.5),
@@ -223,6 +231,7 @@
     striped_rows = striped_rows,
     stripe_fill = stripe_fill,
     stripe_colour = stripe_colour,
+    stripe_alpha = stripe_alpha,
     text_size = text_size,
     grid_lines = FALSE,
     plot_margin = ggplot2::margin(5.5, 5.5, 5.5, 0),
@@ -306,9 +315,9 @@
 #'   headers. Names should match values supplied to `left_columns` or
 #'   `right_columns` after column resolution, such as `"term"`, `"estimate"`,
 #'   `"ci"`, `"p"`, or an arbitrary original dataframe column.
-#' @param digits Number of digits used when formatting estimates and p-values.
-#'   Defaults to `2`. Superseded by `estimate_digits`, `interval_digits`, and
-#'   `p_digits` for separate control.
+#' @param digits Deprecated. Number of digits used when formatting estimates
+#'   and p-values. Defaults to `2`. Use `estimate_digits`, `interval_digits`,
+#'   and `p_digits` for separate control.
 #' @param estimate_digits Number of digits used for point estimates.
 #' @param interval_digits Number of digits used for confidence interval bounds.
 #' @param p_digits Number of digits used for p-values.
@@ -334,6 +343,8 @@
 #'   stripe fill used in [ggforestplot()].
 #' @param stripe_colour Outline colour for striped rows. Defaults to the
 #'   stripe outline used in [ggforestplot()].
+#' @param stripe_alpha Transparency for striped rows. Defaults to the stripe
+#'   alpha used in [ggforestplot()].
 #' @param left_width Optional width allocated to the left table block. By
 #'   default this is derived from the number of displayed left-side columns
 #'   relative to `plot_width`.
@@ -398,9 +409,14 @@ add_split_table <- function(plot = NULL,
                             striped_rows = NULL,
                             stripe_fill = NULL,
                             stripe_colour = NULL,
+                            stripe_alpha = NULL,
                             left_width = NULL,
                             plot_width = NULL,
                             right_width = NULL) {
+  if (!missing(digits)) {
+    warn_deprecated_argument("digits", "`estimate_digits`, `interval_digits`, and `p_digits`")
+  }
+
   if (is.null(plot)) {
     return(structure(
       list(
@@ -430,6 +446,7 @@ add_split_table <- function(plot = NULL,
         striped_rows = striped_rows,
         stripe_fill = stripe_fill,
         stripe_colour = stripe_colour,
+        stripe_alpha = stripe_alpha,
         left_width = left_width,
         plot_width = plot_width,
         right_width = right_width
@@ -466,6 +483,7 @@ add_split_table <- function(plot = NULL,
     striped_rows = striped_rows,
     stripe_fill = stripe_fill,
     stripe_colour = stripe_colour,
+    stripe_alpha = stripe_alpha,
     left_width = left_width,
     plot_width = plot_width,
     right_width = right_width

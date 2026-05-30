@@ -32,6 +32,7 @@ add_forest_table(
   striped_rows = NULL,
   stripe_fill = NULL,
   stripe_colour = NULL,
+  stripe_alpha = NULL,
   grid_lines = FALSE,
   grid_line_colour = "black",
   grid_line_size = 0.3,
@@ -45,19 +46,19 @@ add_forest_table(
 \item{position}{Whether to place the table on the left or right of the
 forest plot.}
 
-\item{show_terms}{Whether to show the term column in the table. Soft-
-deprecated; use \code{columns} instead.}
+\item{show_terms}{Deprecated. Whether to show the term column in the table.
+Use \code{columns} instead.}
 
-\item{show_n}{Whether to show the \code{N} column. Soft-deprecated; use
+\item{show_n}{Deprecated. Whether to show the \code{N} column. Use \code{columns}
+instead.}
+
+\item{show_events}{Deprecated. Whether to show the \code{Events} column. Use
 \code{columns} instead.}
 
-\item{show_events}{Whether to show the \code{Events} column. Soft-deprecated;
-use \code{columns} instead.}
+\item{show_estimate}{Deprecated. Whether to show the formatted estimate and
+confidence interval column. Use \code{columns} instead.}
 
-\item{show_estimate}{Whether to show the formatted estimate and confidence
-interval column. Soft-deprecated; use \code{columns} instead.}
-
-\item{show_p}{Whether to display the p-value column. Soft-deprecated; use
+\item{show_p}{Deprecated. Whether to display the p-value column. Use
 \code{columns} instead.}
 
 \item{columns}{Optional explicit columns to display in the side table, in
@@ -83,9 +84,9 @@ headers. Names should match values supplied to \code{columns} after column
 resolution, such as \code{"term"}, \code{"estimate"}, \code{"ci"}, \code{"p"}, or an arbitrary
 original dataframe column.}
 
-\item{digits}{Number of digits used when formatting estimates and p-values.
-Defaults to \code{2}. Superseded by \code{estimate_digits}, \code{interval_digits}, and
-\code{p_digits} for separate control.}
+\item{digits}{Deprecated. Number of digits used when formatting estimates
+and p-values. Defaults to \code{2}. Use \code{estimate_digits}, \code{interval_digits},
+and \code{p_digits} for separate control.}
 
 \item{estimate_digits}{Number of digits used for point estimates.}
 
@@ -122,6 +123,9 @@ stripe fill used in \code{\link[=ggforestplot]{ggforestplot()}}.}
 
 \item{stripe_colour}{Outline colour for striped rows. Defaults to the
 stripe outline used in \code{\link[=ggforestplot]{ggforestplot()}}.}
+
+\item{stripe_alpha}{Transparency for striped rows. Defaults to the stripe
+alpha used in \code{\link[=ggforestplot]{ggforestplot()}}.}
 
 \item{grid_lines}{Whether to draw black horizontal grid lines in the table.}
 

@@ -32,6 +32,7 @@ add_split_table(
   striped_rows = NULL,
   stripe_fill = NULL,
   stripe_colour = NULL,
+  stripe_alpha = NULL,
   left_width = NULL,
   plot_width = NULL,
   right_width = NULL
@@ -87,9 +88,9 @@ headers. Names should match values supplied to \code{left_columns} or
 \code{right_columns} after column resolution, such as \code{"term"}, \code{"estimate"},
 \code{"ci"}, \code{"p"}, or an arbitrary original dataframe column.}
 
-\item{digits}{Number of digits used when formatting estimates and p-values.
-Defaults to \code{2}. Superseded by \code{estimate_digits}, \code{interval_digits}, and
-\code{p_digits} for separate control.}
+\item{digits}{Deprecated. Number of digits used when formatting estimates
+and p-values. Defaults to \code{2}. Use \code{estimate_digits}, \code{interval_digits},
+and \code{p_digits} for separate control.}
 
 \item{estimate_digits}{Number of digits used for point estimates.}
 
@@ -127,6 +128,9 @@ stripe fill used in \code{\link[=ggforestplot]{ggforestplot()}}.}
 
 \item{stripe_colour}{Outline colour for striped rows. Defaults to the
 stripe outline used in \code{\link[=ggforestplot]{ggforestplot()}}.}
+
+\item{stripe_alpha}{Transparency for striped rows. Defaults to the stripe
+alpha used in \code{\link[=ggforestplot]{ggforestplot()}}.}
 
 \item{left_width}{Optional width allocated to the left table block. By
 default this is derived from the number of displayed left-side columns

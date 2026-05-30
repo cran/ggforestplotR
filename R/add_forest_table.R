@@ -25,6 +25,7 @@
                                   striped_rows = NULL,
                                   stripe_fill = NULL,
                                   stripe_colour = NULL,
+                                  stripe_alpha = NULL,
                                   grid_lines = FALSE,
                                   grid_line_colour = "black",
                                   grid_line_size = 0.3,
@@ -40,6 +41,8 @@
   if (is.null(state)) {
     stop("`plot` must be created by `ggforestplot()` before calling `add_forest_table()`.", call. = FALSE)
   }
+
+  state <- align_forest_state_to_plot_y_scale(state, plot)
 
   if (is.null(show_n)) {
     show_n <- any(!is.na(state$forest_data$n) & nzchar(state$forest_data$n))
@@ -86,6 +89,10 @@
 
   if (is.null(stripe_colour)) {
     stripe_colour <- state$defaults$stripe_colour
+  }
+
+  if (is.null(stripe_alpha)) {
+    stripe_alpha <- state$defaults$stripe_alpha
   }
 
   table_columns <- if (is.null(columns)) {
@@ -159,6 +166,7 @@
     striped_rows = striped_rows,
     stripe_fill = stripe_fill,
     stripe_colour = stripe_colour,
+    stripe_alpha = stripe_alpha,
     text_size = text_size,
     grid_lines = grid_lines,
     grid_line_colour = grid_line_colour,
@@ -188,15 +196,15 @@
 #'   `+ add_forest_table(...)` syntax.
 #' @param position Whether to place the table on the left or right of the
 #'   forest plot.
-#' @param show_terms Whether to show the term column in the table. Soft-
-#'   deprecated; use `columns` instead.
-#' @param show_n Whether to show the `N` column. Soft-deprecated; use
+#' @param show_terms Deprecated. Whether to show the term column in the table.
+#'   Use `columns` instead.
+#' @param show_n Deprecated. Whether to show the `N` column. Use `columns`
+#'   instead.
+#' @param show_events Deprecated. Whether to show the `Events` column. Use
 #'   `columns` instead.
-#' @param show_events Whether to show the `Events` column. Soft-deprecated;
-#'   use `columns` instead.
-#' @param show_estimate Whether to show the formatted estimate and confidence
-#'   interval column. Soft-deprecated; use `columns` instead.
-#' @param show_p Whether to display the p-value column. Soft-deprecated; use
+#' @param show_estimate Deprecated. Whether to show the formatted estimate and
+#'   confidence interval column. Use `columns` instead.
+#' @param show_p Deprecated. Whether to display the p-value column. Use
 #'   `columns` instead.
 #' @param columns Optional explicit columns to display in the side table, in
 #'   the order they should appear. Accepts built-in names such as `"term"`,
@@ -214,9 +222,9 @@
 #'   headers. Names should match values supplied to `columns` after column
 #'   resolution, such as `"term"`, `"estimate"`, `"ci"`, `"p"`, or an arbitrary
 #'   original dataframe column.
-#' @param digits Number of digits used when formatting estimates and p-values.
-#'   Defaults to `2`. Superseded by `estimate_digits`, `interval_digits`, and
-#'   `p_digits` for separate control.
+#' @param digits Deprecated. Number of digits used when formatting estimates
+#'   and p-values. Defaults to `2`. Use `estimate_digits`, `interval_digits`,
+#'   and `p_digits` for separate control.
 #' @param estimate_digits Number of digits used for point estimates.
 #' @param interval_digits Number of digits used for confidence interval bounds.
 #' @param p_digits Number of digits used for p-values.
@@ -241,6 +249,8 @@
 #'   stripe fill used in [ggforestplot()].
 #' @param stripe_colour Outline colour for striped rows. Defaults to the
 #'   stripe outline used in [ggforestplot()].
+#' @param stripe_alpha Transparency for striped rows. Defaults to the stripe
+#'   alpha used in [ggforestplot()].
 #' @param grid_lines Whether to draw black horizontal grid lines in the table.
 #' @param grid_line_colour Colour used for the table grid lines.
 #' @param grid_line_size Line width used for the table grid lines.
@@ -301,10 +311,35 @@ add_forest_table <- function(plot = NULL,
                              striped_rows = NULL,
                              stripe_fill = NULL,
                              stripe_colour = NULL,
+                             stripe_alpha = NULL,
                              grid_lines = FALSE,
                              grid_line_colour = "black",
                              grid_line_size = 0.3,
                              grid_line_linetype = 1) {
+  if (!missing(show_terms)) {
+    warn_deprecated_argument("show_terms", "`columns`")
+  }
+
+  if (!missing(show_n)) {
+    warn_deprecated_argument("show_n", "`columns`")
+  }
+
+  if (!missing(show_events)) {
+    warn_deprecated_argument("show_events", "`columns`")
+  }
+
+  if (!missing(show_estimate)) {
+    warn_deprecated_argument("show_estimate", "`columns`")
+  }
+
+  if (!missing(show_p)) {
+    warn_deprecated_argument("show_p", "`columns`")
+  }
+
+  if (!missing(digits)) {
+    warn_deprecated_argument("digits", "`estimate_digits`, `interval_digits`, and `p_digits`")
+  }
+
   position <- match.arg(position)
 
   if (is.null(plot)) {
@@ -336,6 +371,7 @@ add_forest_table <- function(plot = NULL,
         striped_rows = striped_rows,
         stripe_fill = stripe_fill,
         stripe_colour = stripe_colour,
+        stripe_alpha = stripe_alpha,
         grid_lines = grid_lines,
         grid_line_colour = grid_line_colour,
         grid_line_size = grid_line_size,
@@ -373,6 +409,7 @@ add_forest_table <- function(plot = NULL,
     striped_rows = striped_rows,
     stripe_fill = stripe_fill,
     stripe_colour = stripe_colour,
+    stripe_alpha = stripe_alpha,
     grid_lines = grid_lines,
     grid_line_colour = grid_line_colour,
     grid_line_size = grid_line_size,

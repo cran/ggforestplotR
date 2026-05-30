@@ -1,6 +1,6 @@
 Package: ggforestplotR
 Title: Publication-Ready Forest Plots with 'ggplot2'
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person(given = "Carson",
            family = "Richardson",
@@ -12,7 +12,6 @@ Description: Transform model coefficients into flexible forest
     publication-ready forest plots with a consistent interface.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Imports: ggplot2, patchwork, rlang
 Suggests: broom, dplyr, knitr, rmarkdown, survival, testthat (>=
         3.0.0), tibble
@@ -22,9 +21,10 @@ Config/Needs/website: pkgdown
 URL: https://thatoneguy006.github.io/ggforestplotR/,
         https://github.com/thatoneguy006/ggforestplotR
 BugReports: https://github.com/thatoneguy006/ggforestplotR/issues
+Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-05-20 01:38:27 UTC; Carso
+Packaged: 2026-05-30 00:33:51 UTC; Carso
 Author: Carson Richardson [aut, cre, cph]
 Maintainer: Carson Richardson <carson.richardson@outlook.com>
 Repository: CRAN
-Date/Publication: 2026-05-20 03:00:02 UTC
+Date/Publication: 2026-05-30 02:20:02 UTC

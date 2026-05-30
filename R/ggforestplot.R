@@ -14,9 +14,12 @@
 #'   Names should match values in the term column and values are the labels to
 #'   display.
 #' @param group Optional column name used for color-grouping estimates.
-#' @param grouping Optional column name used to split rows into grouped plot
+#' @param facet Optional column name used to split rows into faceted plot
 #'   sections.
-#' @param grouping_strip_position Positioning for grouped section strips.
+#' @param facet_strip_position Positioning for facet strip labels.
+#' @param grouping Deprecated. Use `facet` instead.
+#' @param grouping_strip_position Deprecated. Use `facet_strip_position`
+#'   instead.
 #' @param separate_groups Optional column name used to identify labeled
 #'   variable blocks that can be outlined with grid lines.
 #' @param n Optional column name holding sample sizes or other N labels for
@@ -32,7 +35,8 @@
 #'   `"ascending"`.
 #' @param point_size Point size for coefficient markers.
 #' @param point_shape Shape used for coefficient markers.
-#' @param line_size Line width for confidence intervals.
+#' @param linewidth Line width for confidence intervals.
+#' @param line_size Deprecated. Use `linewidth` instead.
 #' @param staple_width Width of the terminal staples on confidence interval
 #'   lines.
 #' @param dodge_width Horizontal dodging used for grouped estimates.
@@ -44,19 +48,13 @@
 #' @param striped_rows Logical; if `TRUE`, shade alternating rows.
 #' @param stripe_fill Fill color used for shaded rows.
 #' @param stripe_colour Border color for shaded rows.
-#' @param zero_line Logical; if `TRUE`, draw a null reference line. Superseded
-#'   by `ref_line`.
-#' @param zero_line_linetype Line type for the null reference line. Superseded
-#'   by `ref_line_linetype`.
-#' @param zero_line_colour Color for the null reference line. Superseded by
-#'   `ref_line_colour`.
-#' @param ref_line Logical; if `TRUE`, draw a reference line. Defaults to
-#'   `zero_line` for backward compatibility.
-#' @param ref_line_value Numeric x-value where the reference line is drawn.
-#'   Defaults to `0` for additive effects and `1` for exponentiated effects.
-#' @param ref_line_label Optional label drawn alongside the reference line.
-#' @param ref_line_linetype Line type for the reference line.
-#' @param ref_line_colour Color for the reference line.
+#' @param stripe_alpha Transparency for shaded rows.
+#' @param ref_line Numeric x-value where the reference line is drawn, or
+#'   `NULL` to hide it. When omitted, defaults to `0` for additive effects and
+#'   `1` for exponentiated effects.
+#' @param ref_label Optional label drawn alongside the reference line.
+#' @param ref_linetype Line type for the reference line.
+#' @param ref_color Color for the reference line.
 #'
 #' @return A `ggplot` object. Use standard `ggplot2` functions such as
 #'   [ggplot2::labs()] for plot labels, and add composition helpers after
@@ -82,8 +80,10 @@ ggforestplot <- function(data,
                          label = term,
                          term_labels = NULL,
                          group = NULL,
+                         facet = NULL,
+                         facet_strip_position = c("left", "right"),
                          grouping = NULL,
-                         grouping_strip_position = c("left", "right"),
+                         grouping_strip_position = NULL,
                          separate_groups = NULL,
                          n = NULL,
                          events = NULL,
@@ -92,7 +92,8 @@ ggforestplot <- function(data,
                          sort_terms = c("none", "descending", "ascending"),
                          point_size = 2.3,
                          point_shape = 19,
-                         line_size = 0.5,
+                         linewidth = 0.5,
+                         line_size = NULL,
                          staple_width = 0.2,
                          dodge_width = 0.6,
                          separate_lines = FALSE,
@@ -102,19 +103,45 @@ ggforestplot <- function(data,
                          striped_rows = FALSE,
                          stripe_fill = "grey95",
                          stripe_colour = NA,
-                         zero_line = TRUE,
-                         zero_line_linetype = 2,
-                         zero_line_colour = "grey60",
+                         stripe_alpha = 1,
                          ref_line = NULL,
-                         ref_line_value = NULL,
-                         ref_line_label = NULL,
-                         ref_line_linetype = NULL,
-                         ref_line_colour = NULL) {
+                         ref_label = NULL,
+                         ref_linetype = 2,
+                         ref_color = "grey60") {
+  ref_line_missing <- missing(ref_line)
+
+  if (!missing(line_size)) {
+    if (!missing(linewidth)) {
+      stop("Use only one of `linewidth` or deprecated `line_size`.", call. = FALSE)
+    }
+
+    warn_deprecated_argument("line_size", "`linewidth`")
+    linewidth <- line_size
+  }
+
+  if (!missing(grouping)) {
+    if (!is.null(facet)) {
+      stop("Use only one of `facet` or deprecated `grouping`.", call. = FALSE)
+    }
+
+    warn_deprecated_argument("grouping", "`facet`")
+    facet <- grouping
+  }
+
+  if (!missing(grouping_strip_position)) {
+    if (!missing(facet_strip_position)) {
+      stop(
+        "Use only one of `facet_strip_position` or deprecated `grouping_strip_position`.",
+        call. = FALSE
+      )
+    }
+
+    warn_deprecated_argument("grouping_strip_position", "`facet_strip_position`")
+    facet_strip_position <- grouping_strip_position
+  }
+
   sort_terms <- match.arg(sort_terms)
-  grouping_strip_position <- match.arg(grouping_strip_position)
-  draw_ref_line <- if (is.null(ref_line)) isTRUE(zero_line) else isTRUE(ref_line)
-  ref_line_linetype <- if (is.null(ref_line_linetype)) zero_line_linetype else ref_line_linetype
-  ref_line_colour <- if (is.null(ref_line_colour)) zero_line_colour else ref_line_colour
+  facet_strip_position <- match.arg(facet_strip_position)
 
   forest_data <- if (is.data.frame(data)) {
     as_forest_data(
@@ -126,7 +153,7 @@ ggforestplot <- function(data,
       label = label,
       term_labels = term_labels,
       group = group,
-      grouping = grouping,
+      grouping = facet,
       separate_groups = separate_groups,
       n = n,
       events = events,
@@ -154,16 +181,20 @@ ggforestplot <- function(data,
     axis_label <- if (isTRUE(plot_exponentiate)) "Estimate (log scale)" else "Estimate"
   }
 
-  if (is.null(ref_line_value)) {
-    ref_line_value <- if (isTRUE(plot_exponentiate)) 1 else 0
+  default_ref_line <- if (isTRUE(plot_exponentiate)) 1 else 0
+
+  if (ref_line_missing) {
+    ref_line <- default_ref_line
   }
 
-  if (!is.numeric(ref_line_value) || length(ref_line_value) != 1L || is.na(ref_line_value)) {
-    stop("`ref_line_value` must be a single numeric value.", call. = FALSE)
+  draw_ref_line <- !is.null(ref_line)
+
+  if (isTRUE(draw_ref_line) && (!is.numeric(ref_line) || length(ref_line) != 1L || is.na(ref_line))) {
+    stop("`ref_line` must be a single numeric value or `NULL`.", call. = FALSE)
   }
 
-  if (isTRUE(plot_exponentiate) && ref_line_value <= 0) {
-    stop("`ref_line_value` must be positive for exponentiated plots.", call. = FALSE)
+  if (isTRUE(plot_exponentiate) && isTRUE(draw_ref_line) && ref_line <= 0) {
+    stop("`ref_line` must be positive for exponentiated plots.", call. = FALSE)
   }
 
   display_data <- build_forest_plot_data(forest_data)
@@ -178,7 +209,7 @@ ggforestplot <- function(data,
       forest_data,
       exponentiate = plot_exponentiate,
       include_zero = draw_ref_line,
-      ref_line_value = ref_line_value
+      ref_line = ref_line
     )
 
     plot_stripe_data$xmin <- plot_x_limits[1]
@@ -217,7 +248,8 @@ ggforestplot <- function(data,
       ),
       inherit.aes = FALSE,
       fill = stripe_fill,
-      colour = stripe_colour
+      colour = stripe_colour,
+      alpha = stripe_alpha
     )
   }
 
@@ -235,7 +267,7 @@ ggforestplot <- function(data,
   p <- p +
     ggplot2::geom_errorbar(
       width = staple_width,
-      linewidth = line_size,
+      linewidth = linewidth,
       position = dodge,
       orientation = "y"
     ) +
@@ -256,21 +288,21 @@ ggforestplot <- function(data,
 
   if (isTRUE(draw_ref_line)) {
     p <- p + ggplot2::geom_vline(
-      xintercept = ref_line_value,
-      linetype = ref_line_linetype,
-      colour = ref_line_colour
+      xintercept = ref_line,
+      linetype = ref_linetype,
+      colour = ref_color
     )
 
-    if (!is.null(ref_line_label)) {
+    if (!is.null(ref_label)) {
       p <- p + ggplot2::annotate(
         "text",
-        x = ref_line_value,
+        x = ref_line,
         y = Inf,
-        label = ref_line_label,
+        label = ref_label,
         angle = 90,
         hjust = 1.1,
         vjust = -0.4,
-        colour = ref_line_colour
+        colour = ref_color
       )
     }
   }
@@ -287,7 +319,7 @@ ggforestplot <- function(data,
       ggplot2::vars(grouping_panel),
       ncol = 1,
       scales = "free_y",
-      strip.position = grouping_strip_position
+      strip.position = facet_strip_position
     )
   }
 
@@ -301,18 +333,18 @@ ggforestplot <- function(data,
     forest_data = forest_data,
     stripe_data = stripe_data,
     has_groupings = display_data$has_groupings,
-    grouping_strip_position = grouping_strip_position,
+    facet_strip_position = facet_strip_position,
+    grouping_strip_position = facet_strip_position,
     defaults = list(
       striped_rows = striped_rows,
       stripe_fill = stripe_fill,
       stripe_colour = stripe_colour,
+      stripe_alpha = stripe_alpha,
       exponentiate = plot_exponentiate,
       estimate_label = estimate_label,
       axis_label = axis_label,
-      ref_line = draw_ref_line,
-      ref_line_value = ref_line_value,
-      ref_line_label = ref_line_label,
-      zero_line = draw_ref_line
+      ref_line = ref_line,
+      ref_label = ref_label
     )
   )
 
