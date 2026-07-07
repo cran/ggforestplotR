@@ -3,6 +3,7 @@ ___
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/thatoneguy006/ggforestplotR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thatoneguy006/ggforestplotR/actions/workflows/R-CMD-check.yaml)
   [![Codecov](https://codecov.io/gh/thatoneguy006/ggforestplotR/branch/dev/graph/badge.svg)](https://app.codecov.io/gh/thatoneguy006/ggforestplotR)
+  [![CRAN version](https://www.r-pkg.org/badges/version/ggforestplotR)](https://CRAN.R-project.org/package=ggforestplotR)
 <!-- badges: end -->
 
 ## Overview
@@ -90,5 +91,6 @@ ggforestplot(
 - `ggforestplot()` builds the plotting panel from a data frame or supported model object.
 - `add_forest_table()` attaches a summary table to the left or right side of the plot.
 - `add_split_table()` creates a more traditional forestplot layout with table columns on both sides of the plot.
+- `bind_forest_models()` binds output from several models for grouped plotting.
 - `as_forest_data()` standardizes custom coefficient data.
 - `tidy_forest_model()` converts fitted models into plotting-ready coefficient data.
